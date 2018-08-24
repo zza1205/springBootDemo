@@ -1,10 +1,34 @@
 //Jenkinsfile (Declarative Pipeline)
-pipeline {
-    agent { docker { image 'maven:3.3.3' } }
+#!groovy
+pipeline{
+    agent none
+    options {
+        timeout(time: 1, unit: 'HOURS')
+    }
     stages {
-        stage('build') {
+        stage('Spring Boot Demo') {
+            agent{
+                node {
+                    label ''
+                }
+            }
             steps {
-                sh 'mvn --version'
+                checkout([
+                        $class                              :'GitSCM',
+                        branches                            :[[name: '*/master']],
+                        doGenerateSubmoduleConfigurations   : false,
+                        extensions                          :[[]],
+                        gitTool                             :'Default',
+                        submoduleCfg                        :[],
+                        userRemoteConfigs                   :[[
+                                                                credentialsId: 'zza1205' + 'Cross.12345',
+                                                                url     :'https://github.com/zza1205/springBootDemo'
+                        ]]
+                ])
+                sh 'mvn 3.5.4' +
+                        '-f pom.xml' + springBootDemo/pom.xml
+                        '-U clean install'
+
             }
         }
     }
